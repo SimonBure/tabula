@@ -1,9 +1,24 @@
+#let caption-words = (
+  en: "Table",
+  zh: "表",
+  ja: "表",
+  ko: "표",
+  fr: "Tableau",
+  de: "Tabelle",
+  es: "Tabla",
+  it: "Tabella",
+  pt: "Tabela",
+  ru: "Таблица",
+)
+// caption 用词取自文档语言 text.lang；未覆盖的语种回退到英文。
+// 新语种在此补充，即可让 `academic-table` 自动使用对应语言。
+
 #let formats = (
   booktabs: (
     top-stroke: 1.5pt,
     mid-stroke: 0.75pt,
     bottom-stroke: 1.5pt,
-    caption-label: (nr) => [Table #nr],
+    caption-label: (word, nr) => [#word #nr],
     caption-sep: ": ",
     caption-title-transform: (title) => title,
     caption-align: left,
@@ -12,7 +27,7 @@
     top-stroke: 1pt,
     mid-stroke: 1pt,
     bottom-stroke: 1pt,
-    caption-label: (nr) => text(weight: "bold")[Table #nr],
+    caption-label: (word, nr) => text(weight: "bold")[#word #nr],
     caption-sep: "\n",
     caption-title-transform: (title) => emph(title),
     caption-align: left,
@@ -21,7 +36,7 @@
     top-stroke: 1.5pt,
     mid-stroke: 0.75pt,
     bottom-stroke: 1.5pt,
-    caption-label: (nr) => upper[TABLE #numbering("I", nr)],
+    caption-label: (word, nr) => upper[#word #numbering("I", nr)],
     caption-sep: "\n",
     caption-title-transform: (title) => upper(title),
     caption-align: center,
@@ -30,7 +45,7 @@
     top-stroke: 1.5pt,
     mid-stroke: 0.75pt,
     bottom-stroke: 1.5pt,
-    caption-label: (nr) => text(weight: "bold")[Table #nr.],
+    caption-label: (word, nr) => text(weight: "bold")[#word #nr.],
     caption-sep: " ",
     caption-title-transform: (title) => title,
     caption-align: left,
@@ -39,7 +54,7 @@
     top-stroke: 1.5pt,
     mid-stroke: 0.75pt,
     bottom-stroke: 1.5pt,
-    caption-label: (nr) => text(weight: "bold")[Table #nr],
+    caption-label: (word, nr) => text(weight: "bold")[#word #nr],
     caption-sep: " | ",
     caption-title-transform: (title) => title,
     caption-align: left,
@@ -48,7 +63,7 @@
     top-stroke: 1.5pt,
     mid-stroke: 0.75pt,
     bottom-stroke: 1.5pt,
-    caption-label: (nr) => [Table #nr.],
+    caption-label: (word, nr) => [#word #nr.],
     caption-sep: " ",
     caption-title-transform: (title) => title,
     caption-align: left,
@@ -57,7 +72,7 @@
     top-stroke: 1pt,
     mid-stroke: 1pt,
     bottom-stroke: 1pt,
-    caption-label: (nr) => [Table #nr.],
+    caption-label: (word, nr) => [#word #nr.],
     caption-sep: " ",
     caption-title-transform: (title) => title,
     caption-align: left,
@@ -66,12 +81,17 @@
     top-stroke: 1.5pt,
     mid-stroke: 0.75pt,
     bottom-stroke: 1.5pt,
-    caption-label: (nr) => text(weight: "bold")[Table #nr.],
+    caption-label: (word, nr) => text(weight: "bold")[#word #nr.],
     caption-sep: " ",
     caption-title-transform: (title) => title,
     caption-align: left,
   ),
 )
+
+#let _caption-word() = {
+  let primary = str(text.lang).split("-").at(0)
+  caption-words.at(primary, default: caption-words.en)
+}
 
 #let academic-table(
   caption,
@@ -87,9 +107,13 @@
 
   set figure.caption(position: top)
 
-  show figure.caption: cap => {
+  // 表格独立成 kind:table，获得独立编号与本地化的 supplement（表/Table）。
+  set figure(kind: table)
+
+  show figure.caption: cap => context {
     set align(preset.caption-align)
-    let label-content = (preset.caption-label)(int(cap.counter.display()))
+    let word = _caption-word()
+    let label-content = (preset.caption-label)(word, int(cap.counter.display()))
     let title-content = (preset.caption-title-transform)(cap.body)
     if preset.caption-sep == "\n" {
       label-content

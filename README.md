@@ -7,7 +7,7 @@ Akatable wraps Typst's native `table` in a single `academic-table` function that
 ## Quick start
 
 ```typst
-#import "@preview/akatable:0.1.0": academic-table
+#import "@preview/akatable:0.2.0": academic-table
 
 #academic-table(
   [Population of major cities],
@@ -86,6 +86,25 @@ Use `format: "name"` to switch between publisher styles. Each preset controls ru
 | `elsevier` | Table 1. | plain | left |
 | `chicago` | Table 1. | plain | left |
 | `acm` | **Table 1.** | plain | left |
+
+### Localized captions
+
+The caption label word follows the document language (`text.lang`). In a Chinese document the `booktabs` example above becomes `表 1:`, in Japanese `表 1:`, in French `Tableau 1:`, and so on. The preset's number style and alignment are kept; only the label word is translated. `ieee` keeps its all-caps style and Roman numerals (`表 I` / `TABLE I`). Unknown languages fall back to English.
+
+| Language (`text.lang`) | Label word |
+|---|---|
+| `en` | Table |
+| `zh` | 表 |
+| `ja` | 表 |
+| `ko` | 표 |
+| `fr` | Tableau |
+| `de` | Tabelle |
+| `es` | Tabla |
+| `it` | Tabella |
+| `pt` | Tabela |
+| `ru` | Таблица |
+
+Tables are created as `kind: table`, so they get their own numbering and a localized cross-reference supplement — `@tab:results` renders `表 1` in Chinese and `Table 1` in English. To add a language, append its label word to the `caption-words` dictionary in `src/akatable.typ`.
 
 ### Usage
 
